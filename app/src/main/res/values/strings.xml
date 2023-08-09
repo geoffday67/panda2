@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Panda</string>
+    <string name="app_title">Panda</string>
+    <string name="kettle_menu">Kettle</string>
+    <string name="hobby_house_menu">Hobby house</string>
+    <string name="kitchen_menu">Kitchen</string>
+    <string name="shower_menu">Shower</string>
+    <string name="lights_on">Lights on</string>
+    <string name="lights_off">Lights off</string>
+    <string name="security_title">Security lights</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+</resources>

@@ -44,6 +44,7 @@ import org.koin.androidx.compose.get
 import uk.co.sullenart.panda2.hobbyhouse.HobbyHouseScreen
 import uk.co.sullenart.panda2.kettle.KettleScreen
 import uk.co.sullenart.panda2.kitchen.KitchenScreen
+import uk.co.sullenart.panda2.photos.PhotosScreen
 import uk.co.sullenart.panda2.shower.ShowerScreen
 import uk.co.sullenart.panda2.ui.theme.Panda2Theme
 
@@ -57,8 +58,9 @@ class MainActivity : ComponentActivity() {
     private val hobbyHouseMenu = MenuItem(R.string.hobby_house_menu, "hobby-house")
     private val kitchenMenu = MenuItem(R.string.kitchen_menu, "kitchen")
     private val showerMenu = MenuItem(R.string.shower_menu, "shower")
-    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu)
-    private val startItem = kitchenMenu
+    private val photosMenu = MenuItem(R.string.photos_menu, "photos")
+    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu, photosMenu)
+    private val startItem = photosMenu
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -145,6 +147,9 @@ class MainActivity : ComponentActivity() {
                                 }
                                 composable(showerMenu.route) {
                                     ShowerScreen()
+                                }
+                                composable(photosMenu.route) {
+                                    PhotosScreen()
                                 }
                             }
                         }

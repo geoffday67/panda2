@@ -1,6 +1,7 @@
 package uk.co.sullenart.panda2.service
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -12,8 +13,6 @@ import timber.log.Timber
 class Auth(
     private val tokensRepository: TokensRepository,
 ) {
-    private val tokens = Tokens()
-
     private interface Service {
         @POST("/token")
         @FormUrlEncoded
@@ -45,43 +44,55 @@ class Auth(
             .create(Service::class.java)
     }
 
+    fun hasTokens(): Flow<Boolean> =
+        tokensRepository.exists()
+
+    suspend fun clearTokens() {
+        tokensRepository.clear()
+    }
+
     private suspend fun storeTokens(tokens: Tokens) {
         tokensRepository.store(tokens)
     }
 
     suspend fun exchangeCode(code: String) {
-        val response = service.exchange(
-            code = code,
-            clientId = CLIENT_ID,
-            clientSecret = CLIENT_SECRET,
-            grantType = GRANT_TYPE,
-            redirectUri = REDIRECT_URI,
-        )
-        val tokens = Tokens(
-            accessToken = response.access_token.orEmpty(),
-            refreshToken = response.refresh_token.orEmpty(),
-        )
-        Timber.i("Code exchanged for $tokens")
-        storeTokens(tokens)
+        try {
+            val response = service.exchange(
+                code = code,
+                clientId = CLIENT_ID,
+                clientSecret = CLIENT_SECRET,
+                grantType = GRANT_TYPE,
+                redirectUri = REDIRECT_URI,
+            )
+            val tokens = Tokens(
+                accessToken = response.access_token.orEmpty(),
+                refreshToken = response.refresh_token.orEmpty(),
+            )
+            Timber.i("Code exchanged for $tokens")
+            storeTokens(tokens)
+        } catch (e: Exception) {
+            Timber.e("Code exchange failed")
+            throw e
+        }
     }
 
     suspend fun refresh() {
         val refreshToken = tokensRepository.getRefresh()
-        if (refreshToken == null) {
-            Timber.w("No refresh token found")
-            return
+        try {
+            val response = service.refresh(
+                clientId = CLIENT_ID,
+                clientSecret = CLIENT_SECRET,
+                refreshToken = refreshToken,
+            )
+            val tokens = Tokens(
+                accessToken = response.access_token.orEmpty(),
+                refreshToken = response.refresh_token.orEmpty(),
+            )
+            Timber.i("Tokens refreshed $tokens")
+            storeTokens(tokens)
+        } catch (ignore: Exception) {
+            Timber.e("Refresh failed")
         }
-        val response = service.refresh(
-            clientId = CLIENT_ID,
-            clientSecret = CLIENT_SECRET,
-            refreshToken = refreshToken,
-        )
-        val tokens = Tokens(
-            accessToken = response.access_token.orEmpty(),
-            refreshToken = response.refresh_token.orEmpty(),
-        )
-        Timber.i("Tokens refreshed $tokens")
-        storeTokens(tokens)
     }
 
     companion object {

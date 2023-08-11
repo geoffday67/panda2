@@ -16,12 +16,6 @@ class AuthInterceptor(
             tokensRepository.getAccess()
         }
 
-        if (accessToken == null) {
-            val exception = IOException("No access token found")
-            Timber.e(exception)
-            throw exception
-        }
-
         var requestBuilder = chain.request().newBuilder()
         requestBuilder.addHeader("Authorization", "Bearer $accessToken")
 

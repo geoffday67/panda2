@@ -53,6 +53,7 @@ class MainApplication : Application() {
                     singleOf(::Auth)
                     singleOf(::AuthInterceptor)
                     factoryOf(::TokensRepository)
+                    singleOf(::Settings)
                 }
             )
         }

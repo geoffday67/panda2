@@ -1,8 +1,5 @@
 package uk.co.sullenart.panda2.photos
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -17,7 +14,7 @@ class PhotosViewModel(
     private val auth: Auth,
 ) : ViewModel() {
     val photoItems = photoPager.flowPhotos.cachedIn(viewModelScope)
-    var authenticated by mutableStateOf(false)
+    val authenticated = auth.hasTokens()
 
     val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
@@ -27,11 +24,19 @@ class PhotosViewModel(
 
     fun completeAuth(account: GoogleSignInAccount) {
         viewModelScope.launch {
-            val code = account.serverAuthCode ?: ""
-            auth.exchangeCode(code)
+            try {
+                val code = account.serverAuthCode ?: ""
+                auth.exchangeCode(code)
+            } catch (ignore: Exception) {
+            }
         }
     }
 
+    fun signOut() {
+        viewModelScope.launch {
+            auth.clearTokens()
+        }
+    }
     companion object {
         private const val SCOPE = "https://www.googleapis.com/auth/photoslibrary.readonly"
     }

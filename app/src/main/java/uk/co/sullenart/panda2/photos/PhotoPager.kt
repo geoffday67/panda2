@@ -6,9 +6,13 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
+import uk.co.sullenart.panda2.service.GooglePhotos
 import java.io.IOException
 
-class PhotoPager {
+class PhotoPager(
+    private val googlePhotos: GooglePhotos,
+) {
     val flowPhotos: Flow<PagingData<Photo>> get() = pager.flow
 
     private val pager = Pager(
@@ -31,11 +35,15 @@ class PhotoPager {
 
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
             try {
-                val result = listOf(
-                    Photo("Geoff"),
-                    Photo("is"),
-                    Photo("great!"),
-                )
+                val pageNumber = params.key ?: 0
+                Timber.d("Sourcing page $pageNumber")
+
+                val result = googlePhotos.getAlbums().map { Photo(title = it.title) }
+//                val result = listOf(
+//                    Photo("Geoff"),
+//                    Photo("is"),
+//                    Photo("great!"),
+//                )
 
                 return LoadResult.Page(
                     data = result,

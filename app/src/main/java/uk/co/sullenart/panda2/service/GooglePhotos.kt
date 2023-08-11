@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import uk.co.sullenart.panda2.photos.Album
 
 class GooglePhotos(
-    private val interceptor: AuthInterceptor,
+    private val authInterceptor: AuthInterceptor,
 ) {
     @Serializable
     private data class AlbumsResponse(
@@ -29,13 +29,11 @@ class GooglePhotos(
 
         @GET("/v1/sharedAlbums")
         suspend fun sharedAlbums(): SharedAlbumsResponse
-
-
     }
 
     private val service: Service by lazy {
         val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor)
+            .addInterceptor(authInterceptor)
             .addInterceptor(HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) })
             .build()
         val contentType = "application/json".toMediaType()
@@ -49,8 +47,12 @@ class GooglePhotos(
     }
 
     suspend fun getAlbums(): List<Album> =
+        try {
         service.albums()
             .albums
+        } catch (ignore: Exception) {
+            emptyList()
+        }
 
     suspend fun getSharedAlbums(): List<Album> =
         try {

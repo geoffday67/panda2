@@ -10,10 +10,10 @@ import kotlinx.coroutines.launch
 import uk.co.sullenart.panda2.service.Auth
 
 class PhotosViewModel(
-    photoPager: PhotoPager,
+    albumPager: AlbumPager,
     private val auth: Auth,
 ) : ViewModel() {
-    val photoItems = photoPager.flowPhotos.cachedIn(viewModelScope)
+    val albumItems = albumPager.flowAlbums.cachedIn(viewModelScope)
     val authenticated = auth.hasTokens()
 
     val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

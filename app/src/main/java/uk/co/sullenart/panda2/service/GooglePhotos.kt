@@ -15,20 +15,19 @@ class GooglePhotos(
 ) {
     @Serializable
     private data class AlbumsResponse(
-        val albums: List<Album>
-    )
-
-    @Serializable
-    private data class SharedAlbumsResponse(
-        val sharedAlbums: List<Album>
-    )
+        val albums: List<AlbumResponse>?,
+    ) {
+        @Serializable
+        data class AlbumResponse(
+            val title: String?,
+            val coverPhotoBaseUrl: String?,
+            val mediaItemsCount: Int?,
+        )
+    }
 
     private interface Service {
         @GET("/v1/albums")
         suspend fun albums(): AlbumsResponse
-
-        @GET("/v1/sharedAlbums")
-        suspend fun sharedAlbums(): SharedAlbumsResponse
     }
 
     private val service: Service by lazy {
@@ -48,16 +47,13 @@ class GooglePhotos(
 
     suspend fun getAlbums(): List<Album> =
         try {
-        service.albums()
-            .albums
-        } catch (ignore: Exception) {
-            emptyList()
-        }
-
-    suspend fun getSharedAlbums(): List<Album> =
-        try {
-            service.sharedAlbums()
-                .sharedAlbums
+            service.albums().albums.orEmpty().map {
+                Album(
+                    title = it.title.orEmpty(),
+                    items = it.mediaItemsCount ?: 0,
+                    coverUrl = "${it.coverPhotoBaseUrl}=w2048-h1024"
+                )
+            }
         } catch (ignore: Exception) {
             emptyList()
         }

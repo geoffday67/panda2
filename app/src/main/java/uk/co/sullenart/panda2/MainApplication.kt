@@ -12,7 +12,7 @@ import timber.log.Timber
 import uk.co.sullenart.panda2.hobbyhouse.HobbyHouseViewModel
 import uk.co.sullenart.panda2.kettle.KettleViewModel
 import uk.co.sullenart.panda2.kitchen.KitchenViewModel
-import uk.co.sullenart.panda2.photos.PhotoPager
+import uk.co.sullenart.panda2.photos.AlbumPager
 import uk.co.sullenart.panda2.photos.PhotosViewModel
 import uk.co.sullenart.panda2.service.Auth
 import uk.co.sullenart.panda2.service.AuthInterceptor
@@ -48,7 +48,7 @@ class MainApplication : Application() {
                     viewModelOf(::ShowerViewModel)
                     viewModelOf(::PhotosViewModel)
 
-                    factoryOf(::PhotoPager)
+                    factoryOf(::AlbumPager)
                     singleOf(::GooglePhotos)
                     singleOf(::Auth)
                     singleOf(::AuthInterceptor)

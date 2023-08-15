@@ -3,7 +3,6 @@ package uk.co.sullenart.panda2.service
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import timber.log.Timber
 import java.io.IOException
 
 class AuthInterceptor(

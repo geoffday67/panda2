@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,13 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.glance.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import uk.co.sullenart.panda2.hobbyhouse.HobbyHouseScreen
@@ -60,7 +63,7 @@ class MainActivity : ComponentActivity() {
     private val showerMenu = MenuItem(R.string.shower_menu, "shower")
     private val photosMenu = MenuItem(R.string.photos_menu, "photos")
     private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu, photosMenu)
-    private val startItem = photosMenu
+    private val startItem = showerMenu
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,6 +135,8 @@ class MainActivity : ComponentActivity() {
                                     dimensionResource(R.dimen.margin),
                                 )
                         ) {
+                            val context = LocalContext.current
+
                             NavHost(
                                 navController = navController,
                                 startDestination = startItem.route
@@ -156,6 +161,16 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun <viewModel : LifecycleObserver> viewModel.ObserveLifecycleEvents(lifecycle: Lifecycle) {
+    DisposableEffect(lifecycle) {
+        lifecycle.addObserver(this@ObserveLifecycleEvents)
+        onDispose {
+            lifecycle.removeObserver(this@ObserveLifecycleEvents)
         }
     }
 }

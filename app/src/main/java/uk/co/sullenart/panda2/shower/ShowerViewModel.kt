@@ -1,17 +1,25 @@
 package uk.co.sullenart.panda2.shower
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import uk.co.sullenart.panda2.MqttManager
 import uk.co.sullenart.panda2.SnackbarManager
 import uk.co.sullenart.panda2.UiState
@@ -19,20 +27,26 @@ import uk.co.sullenart.panda2.UiState
 class ShowerViewModel(
     private val mqttManager: MqttManager,
     private val snackbarManager: SnackbarManager,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
     var uiState: UiState by mutableStateOf(UiState.Idle)
     var onLevel by mutableStateOf("")
     var offLevel by mutableStateOf("")
-    var humidity: Int? by mutableStateOf(null)
     var status: String? by mutableStateOf(null)
 
-    init {
+    private val _humidity = MutableSharedFlow<Int>()
+    val humidity: Flow<Int>
+        get() = _humidity.asSharedFlow()
+
+    override fun onResume(owner: LifecycleOwner) {
+        Timber.d("Lifecycle resume")
         viewModelScope.launch {
             mqttManager.connect()
 
             launch {
                 mqttManager.subscribe(HUMIDITY_TOPIC).collect {
-                    humidity = it.toIntOrNull()
+                    it.toIntOrNull()?.let {
+                        _humidity.emit(it)
+                    }
                 }
             }
 
@@ -51,7 +65,8 @@ class ShowerViewModel(
         }
     }
 
-    override fun onCleared() {
+    override fun onPause(owner: LifecycleOwner) {
+        Timber.d("Lifecycle pause")
         viewModelScope.launch {
             mqttManager.disconnect()
         }

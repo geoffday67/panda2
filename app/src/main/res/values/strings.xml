@@ -6,6 +6,7 @@
     <string name="kitchen_menu">Kitchen</string>
     <string name="shower_menu">Shower</string>
     <string name="photos_menu">Photos</string>
+    <string name="demo_menu">Demo</string>
     <string name="lights_on">Lights on</string>
     <string name="lights_off">Lights off</string>
     <string name="security_title">Security lights</string>

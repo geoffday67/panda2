@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.androidx.compose.getViewModel
 import uk.co.sullenart.panda2.R
 import uk.co.sullenart.panda2.ShowError
@@ -31,11 +32,22 @@ import uk.co.sullenart.panda2.UiState
 fun XmasLightsScreen(
     viewModel: XmasLightsViewModel = getViewModel()
 ) {
+    XmasLightsContent(
+        lightsOn = viewModel::lightsOn,
+        lightsOff = viewModel::lightsOff,
+        state = viewModel.uiState,
+    )
+}
+
+@Composable
+private fun XmasLightsContent(
+    lightsOn: () -> Unit,
+    lightsOff: () -> Unit,
+    state: UiState,
+) {
     Box(
         Modifier.fillMaxSize()
     ) {
-        val state = viewModel.uiState
-
         if (state is UiState.Loading) {
             ShowLoading()
         }
@@ -55,7 +67,7 @@ fun XmasLightsScreen(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false),
-                        ) { viewModel.lightsOn() }
+                        ) { lightsOn() }
                         .fillMaxHeight()
                         .aspectRatio(1.0f),
                     painter = painterResource(R.drawable.ic_power_on),
@@ -67,7 +79,7 @@ fun XmasLightsScreen(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = rememberRipple(bounded = false),
-                        ) { viewModel.lightsOff() }
+                        ) { lightsOff() }
                         .fillMaxHeight()
                         .aspectRatio(1.0f),
                     painter = painterResource(R.drawable.ic_power_off),
@@ -81,4 +93,14 @@ fun XmasLightsScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewIdle() {
+    XmasLightsContent(
+        lightsOn = {},
+        lightsOff = {},
+        state = UiState.Idle,
+    )
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -133,6 +134,29 @@ fun ShowerScreen(
                     onClick = viewModel::sendLevels
                 ) {
                     Text("Set levels")
+                }
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Button(
+                    onClick = viewModel::fanOn,
+                    enabled = viewModel.immediateEnabled,
+                ) {
+                    Text(
+                        text = stringResource(R.string.fan_on),
+                    )
+                }
+
+                Button(
+                    onClick = viewModel::fanOff,
+                    enabled = viewModel.immediateEnabled,
+                ) {
+                    Text(
+                        text = stringResource(R.string.fan_off),
+                    )
                 }
             }
 

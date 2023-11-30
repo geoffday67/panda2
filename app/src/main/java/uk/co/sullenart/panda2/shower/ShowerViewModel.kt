@@ -32,15 +32,18 @@ class ShowerViewModel(
     var onLevel by mutableStateOf("")
     var offLevel by mutableStateOf("")
     var status: String? by mutableStateOf(null)
+    var immediateEnabled by mutableStateOf(false)
 
     private val _humidity = MutableSharedFlow<Int>()
     val humidity: Flow<Int>
         get() = _humidity.asSharedFlow()
 
     override fun onResume(owner: LifecycleOwner) {
-        Timber.d("Lifecycle resume")
+        immediateEnabled = false
+
         viewModelScope.launch {
             mqttManager.connect()
+            immediateEnabled = true
 
             launch {
                 mqttManager.subscribe(HUMIDITY_TOPIC).collect {
@@ -77,19 +80,20 @@ class ShowerViewModel(
             @SerializedName("on_level") val onLevel: Int,
             @SerializedName("off_level") val offLevel: Int,
         ) : Command
+
+        data class Immediate(
+            @SerializedName("fan") val status: String,
+        ) : Command
     }
 
-    private fun sendCommand(command: Command) {
-        viewModelScope.launch {
-            val text = Gson().toJson(command)
-            uiState = UiState.Loading
-            try {
-                mqttManager.publish(SETTINGS_TOPIC, text, retain = true)
-                uiState = UiState.Idle
-                snackbarManager.add("Settings saved")
-            } catch (e: Exception) {
-                setError(e.message.toString())
-            }
+    private suspend fun sendCommand(command: Command, retain: Boolean) {
+        val text = Gson().toJson(command)
+        uiState = UiState.Loading
+        try {
+            mqttManager.publish(SETTINGS_TOPIC, text, retain = retain)
+            uiState = UiState.Idle
+        } catch (e: Exception) {
+            setError(e.message.toString())
         }
     }
 
@@ -102,11 +106,28 @@ class ShowerViewModel(
     }
 
     fun sendLevels() {
-        val command = Command.Settings(
-            onLevel = onLevel.toIntOrNull() ?: 0,
-            offLevel = offLevel.toIntOrNull() ?: 0,
-        )
-        sendCommand(command)
+        viewModelScope.launch {
+            val command = Command.Settings(
+                onLevel = onLevel.toIntOrNull() ?: 0,
+                offLevel = offLevel.toIntOrNull() ?: 0,
+            )
+            sendCommand(command, retain = true)
+            snackbarManager.add("Settings saved")
+        }
+    }
+
+    fun fanOn() {
+        viewModelScope.launch {
+            sendCommand(Command.Immediate("on"), retain = false)
+            snackbarManager.add("Fan turned on")
+        }
+    }
+
+    fun fanOff() {
+        viewModelScope.launch {
+            sendCommand(Command.Immediate("off"), retain = false)
+            snackbarManager.add("Fan turned off")
+        }
     }
 
     private suspend fun setError(message: String) {

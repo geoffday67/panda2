@@ -6,9 +6,11 @@
     <string name="kitchen_menu">Kitchen</string>
     <string name="shower_menu">Shower</string>
     <string name="photos_menu">Photos</string>
-    <string name="demo_menu">Demo</string>
+    <string name="xmas_menu">Xmas lights</string>
     <string name="lights_on">Lights on</string>
     <string name="lights_off">Lights off</string>
+    <string name="fan_on">Fan on</string>
+    <string name="fan_off">Fan off</string>
     <string name="security_title">Security lights</string>
     <string name="on">On</string>
     <string name="off">Off</string>

@@ -54,12 +54,12 @@ fun ShowerScreen(
         Modifier.fillMaxSize()
     ) {
         val state = viewModel.uiState
-        var humidity by remember { mutableStateOf("waiting...") }
+        var power by remember { mutableStateOf("waiting...") }
         val indicatorAlpha = remember { Animatable(0f) }
 
         LaunchedEffect(Unit) {
-            viewModel.humidity.collect {
-                humidity = "$it%"
+            viewModel.power.collect {
+                power = it
                 indicatorAlpha.animateTo(1f)
                 indicatorAlpha.animateTo(0f)
             }
@@ -81,9 +81,9 @@ fun ShowerScreen(
             ) {
                 Text(
                     buildAnnotatedString {
-                        append("Current humidity: ")
+                        append("Current power: ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(humidity)
+                            append(power)
                         }
                     }
                 )
@@ -104,38 +104,6 @@ fun ShowerScreen(
                     }
                 }
             )
-
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.margin)),
-            ) {
-                TextField(
-                    modifier = Modifier
-                        .weight(1f),
-                    value = viewModel.onLevel,
-                    onValueChange = { viewModel.onLevelChange(it) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text("Extractor on") },
-                )
-                TextField(
-                    modifier = Modifier
-                        .weight(1f),
-                    value = viewModel.offLevel,
-                    onValueChange = { viewModel.offLevelChange(it) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text("Extractor off") },
-                )
-            }
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Button(
-                    onClick = viewModel::sendLevels
-                ) {
-                    Text("Set levels")
-                }
-            }
 
             Row(
                 Modifier.fillMaxWidth(),

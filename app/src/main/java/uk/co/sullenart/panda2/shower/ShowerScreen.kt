@@ -13,13 +13,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.androidx.compose.getViewModel
 import uk.co.sullenart.panda2.ObserveLifecycleEvents
 import uk.co.sullenart.panda2.R
@@ -53,8 +55,7 @@ fun ShowerScreen(
     Box(
         Modifier.fillMaxSize()
     ) {
-        val state = viewModel.uiState
-        var power by remember { mutableStateOf("waiting...") }
+        var power by remember { mutableStateOf("") }
         val indicatorAlpha = remember { Animatable(0f) }
 
         LaunchedEffect(Unit) {
@@ -65,7 +66,7 @@ fun ShowerScreen(
             }
         }
 
-        if (state is UiState.Loading) {
+        if (viewModel.uiState is UiState.Loading) {
             ShowLoading()
         }
 
@@ -74,63 +75,155 @@ fun ShowerScreen(
         ) {
             ShowTitle("Shower")
 
-            Row(
-                modifier = Modifier
-                    .height(IntrinsicSize.Min),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    buildAnnotatedString {
-                        append("Current power: ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(power)
-                        }
-                    }
-                )
-                Spacer(Modifier.width(dimensionResource(R.dimen.small_margin)))
-                Box(
-                    modifier = Modifier
-                        .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha.value), shape = CircleShape)
-                        .fillMaxHeight(0.5f)
-                        .aspectRatio(1f)
-                ) {}
-            }
-
-            Text(
-                buildAnnotatedString {
-                    append("Status: ")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(viewModel.status ?: "waiting...")
-                    }
-                }
+            Power(
+                power = power,
+                indicatorAlpha = indicatorAlpha.value
             )
 
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                Button(
-                    onClick = viewModel::fanOn,
-                    enabled = viewModel.immediateEnabled,
-                ) {
-                    Text(
-                        text = stringResource(R.string.fan_on),
-                    )
-                }
+            Status(
+                status = viewModel.status,
+            )
 
-                Button(
-                    onClick = viewModel::fanOff,
-                    enabled = viewModel.immediateEnabled,
-                ) {
-                    Text(
-                        text = stringResource(R.string.fan_off),
-                    )
+            RunOn(
+                value = viewModel.runOnSecondsString,
+                onChange = viewModel::setRunOn,
+                onSet = viewModel::sendRunOn,
+            )
+        }
+
+        (viewModel.uiState as? UiState.Error)?.let {
+            ShowError(it.message)
+        }
+    }
+}
+
+@Composable
+private fun Power(
+    power: String,
+    indicatorAlpha: Float,
+) {
+    Row(
+        modifier = Modifier
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            buildAnnotatedString {
+                append("Current power: ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(power)
                 }
             }
+        )
+        Spacer(Modifier.width(dimensionResource(R.dimen.small_margin)))
+        Box(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha), shape = CircleShape)
+                .fillMaxHeight(0.5f)
+                .aspectRatio(1f)
+        ) {}
+    }
+}
 
-            if (state is UiState.Error) {
-                ShowError(state.message)
+@Composable
+private fun Status(
+    status: String?,
+) {
+    Text(
+        buildAnnotatedString {
+            append("Status: ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(status ?: "waiting...")
             }
         }
+    )
+}
+
+@Composable
+private fun RunOn(
+    value: String?,
+    onChange: (String) -> Unit,
+    onSet: () -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth(0.8f),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OutlinedTextField(
+            modifier = Modifier.weight(1f),
+            value = value ?: "",
+            onValueChange = { onChange(it) },
+            label = { Text("Run on seconds") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            enabled = value != null,
+        )
+        Button(
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.margin)),
+            onClick = onSet,
+            enabled = value?.isNotBlank() ?: false,
+        ) {
+            Text("Set")
+        }
+    }
+}
+
+@Composable
+private fun ShowerContent(
+    fanOn: () -> Unit,
+    fanOff: () -> Unit,
+    immediateEnabled: Boolean,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.margin))
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Button(
+                onClick = fanOn,
+                enabled = immediateEnabled,
+            ) {
+                Text(
+                    text = stringResource(R.string.fan_on),
+                )
+            }
+
+            Button(
+                onClick = fanOff,
+                enabled = immediateEnabled,
+            ) {
+                Text(
+                    text = stringResource(R.string.fan_off),
+                )
+            }
+        }
+
+    }
+}
+
+@Preview
+@Composable
+fun ContentPreview() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.margin))
+    ) {
+        ShowTitle("Shower Preview")
+
+        Power(
+            power = "off",
+            indicatorAlpha = 1f,
+        )
+
+        Status(
+            status = "Preview",
+        )
+
+        RunOn(
+            value = "1234",
+            onChange = {},
+            onSet = {},
+        )
     }
 }

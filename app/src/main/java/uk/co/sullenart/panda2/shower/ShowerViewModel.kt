@@ -3,6 +3,7 @@ package uk.co.sullenart.panda2.shower
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,7 @@ class ShowerViewModel(
     var uiState: UiState by mutableStateOf(UiState.Idle)
     var status: String? by mutableStateOf(null)
     var immediateEnabled by mutableStateOf(false)
+    var runOnSecondsString: String? by mutableStateOf(null)
 
     private val _power = MutableSharedFlow<String>()
     val power: Flow<String>
@@ -33,8 +35,10 @@ class ShowerViewModel(
 
     override fun onResume(owner: LifecycleOwner) {
         immediateEnabled = false
+        runOnSecondsString = null
 
         viewModelScope.launch {
+            _power.emit("waiting...")
             mqttManager.connect()
             immediateEnabled = true
 
@@ -47,6 +51,7 @@ class ShowerViewModel(
             launch {
                 val json = mqttManager.subscribe(SETTINGS_TOPIC).first()
                 val settings = Gson().fromJson(json, Command.Settings::class.java)
+                runOnSecondsString = settings.runOnTime.toString()
             }
 
             launch {
@@ -95,6 +100,21 @@ class ShowerViewModel(
         viewModelScope.launch {
             sendCommand(Command.Immediate("off"), retain = false)
             snackbarManager.add("Fan turned off")
+        }
+    }
+
+    fun setRunOn(value: String) {
+        if (value.isDigitsOnly()) {
+            runOnSecondsString = value
+        }
+    }
+
+    fun sendRunOn() {
+        viewModelScope.launch {
+            runOnSecondsString?.toIntOrNull()?.let {
+                sendCommand(Command.Settings(it), retain = true)
+                snackbarManager.add("Run on time stored")
+            }
         }
     }
 

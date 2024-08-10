@@ -3,6 +3,9 @@ package uk.co.sullenart.panda2
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -60,8 +63,10 @@ class MainApplication : Application() {
             )
         }
 
-        val token = FirebaseMessaging.getInstance().getToken()
-        Timber.d("Token = $token")
+        GlobalScope.launch {
+            val token = FirebaseMessaging.getInstance().getToken().await()
+            Timber.d("Token = $token")
+        }
     }
 
     companion object {

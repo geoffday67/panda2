@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "623444516140",
+    "project_id": "panda-487f2",
+    "storage_bucket": "panda-487f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623444516140:android:e256c8363e8ca52654e089",
+        "android_client_info": {
+          "package_name": "uk.co.sullenart.panda2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUUEl_42L91xpUvT3O2XtlGWFMR44aKkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

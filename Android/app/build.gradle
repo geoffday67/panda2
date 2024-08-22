@@ -67,6 +67,7 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.navigation:navigation-compose'
     implementation 'androidx.activity:activity-compose'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose'
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-messaging")

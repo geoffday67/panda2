@@ -49,6 +49,7 @@ import uk.co.sullenart.panda2.kettle.KettleScreen
 import uk.co.sullenart.panda2.kitchen.KitchenScreen
 import uk.co.sullenart.panda2.photos.PhotosScreen
 import uk.co.sullenart.panda2.shower.ShowerScreen
+import uk.co.sullenart.panda2.timer.TimerScreen
 import uk.co.sullenart.panda2.ui.theme.Panda2Theme
 import uk.co.sullenart.panda2.xmaslights.XmasLightsScreen
 
@@ -64,8 +65,9 @@ class MainActivity : ComponentActivity() {
     private val showerMenu = MenuItem(R.string.shower_menu, "shower")
     private val photosMenu = MenuItem(R.string.photos_menu, "photos")
     private val xmasMenu = MenuItem(R.string.xmas_menu, "xmas")
-    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu, xmasMenu)
-    private val startItem = kitchenMenu
+    private val timerMenu = MenuItem(R.string.timer_menu, "timer")
+    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu, timerMenu)
+    private val startItem = timerMenu
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,6 +162,9 @@ class MainActivity : ComponentActivity() {
                                 }
                                 composable(xmasMenu.route) {
                                     XmasLightsScreen()
+                                }
+                                composable(timerMenu.route) {
+                                    TimerScreen()
                                 }
                             }
                         }

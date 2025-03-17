@@ -15,4 +15,8 @@
     <string name="security_title">Security lights</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+    <plurals name="remaining">
+        <item quantity="one">" minute to go"</item>
+        <item quantity="other">" minutes to go"</item>
+    </plurals>
 </resources>

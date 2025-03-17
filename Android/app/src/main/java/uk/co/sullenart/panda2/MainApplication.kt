@@ -1,7 +1,6 @@
 package uk.co.sullenart.panda2
 
 import android.app.Application
-import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,6 +23,7 @@ import uk.co.sullenart.panda2.service.AuthInterceptor
 import uk.co.sullenart.panda2.service.GooglePhotos
 import uk.co.sullenart.panda2.service.TokensRepository
 import uk.co.sullenart.panda2.shower.ShowerViewModel
+import uk.co.sullenart.panda2.timer.TimerViewModel
 import uk.co.sullenart.panda2.xmaslights.XmasLightsViewModel
 
 class MainApplication : Application() {
@@ -52,6 +52,7 @@ class MainApplication : Application() {
                     viewModelOf(::KettleViewModel)
                     viewModelOf(::ShowerViewModel)
                     viewModelOf(::PhotosViewModel)
+                    viewModelOf(::TimerViewModel)
 
                     factoryOf(::AlbumPager)
                     singleOf(::GooglePhotos)

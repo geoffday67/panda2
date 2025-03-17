@@ -66,8 +66,8 @@ class MainActivity : ComponentActivity() {
     private val photosMenu = MenuItem(R.string.photos_menu, "photos")
     private val xmasMenu = MenuItem(R.string.xmas_menu, "xmas")
     private val timerMenu = MenuItem(R.string.timer_menu, "timer")
-    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, kettleMenu, showerMenu, timerMenu)
-    private val startItem = timerMenu
+    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, xmasMenu, kettleMenu, showerMenu)
+    private val startItem = kitchenMenu
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {

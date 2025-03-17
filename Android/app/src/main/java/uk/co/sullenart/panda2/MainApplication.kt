@@ -31,7 +31,7 @@ class MainApplication : Application() {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree());
+            Timber.plant(Timber.DebugTree())
         }
 
         startKoin {
@@ -62,11 +62,6 @@ class MainApplication : Application() {
                     singleOf(::Settings)
                 }
             )
-        }
-
-        GlobalScope.launch {
-            val token = FirebaseMessaging.getInstance().getToken().await()
-            Timber.d("Token = $token")
         }
     }
 

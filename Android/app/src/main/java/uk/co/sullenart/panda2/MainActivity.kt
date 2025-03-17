@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 title = { Text(stringResource(R.string.app_title)) },
-                                colors = TopAppBarDefaults.smallTopAppBarColors(
+                                colors = TopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.primary,
                                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -139,8 +139,6 @@ class MainActivity : ComponentActivity() {
                                     dimensionResource(R.dimen.margin),
                                 )
                         ) {
-                            val context = LocalContext.current
-
                             NavHost(
                                 navController = navController,
                                 startDestination = startItem.route

@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -47,6 +46,7 @@ import org.koin.androidx.compose.get
 import uk.co.sullenart.panda2.hobbyhouse.HobbyHouseScreen
 import uk.co.sullenart.panda2.kettle.KettleScreen
 import uk.co.sullenart.panda2.kitchen.KitchenScreen
+import uk.co.sullenart.panda2.outside.OutsideScreen
 import uk.co.sullenart.panda2.photos.PhotosScreen
 import uk.co.sullenart.panda2.shower.ShowerScreen
 import uk.co.sullenart.panda2.timer.TimerScreen
@@ -66,7 +66,8 @@ class MainActivity : ComponentActivity() {
     private val photosMenu = MenuItem(R.string.photos_menu, "photos")
     private val xmasMenu = MenuItem(R.string.xmas_menu, "xmas")
     private val timerMenu = MenuItem(R.string.timer_menu, "timer")
-    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, xmasMenu, kettleMenu, showerMenu)
+    private val outsideMenu = MenuItem(R.string.outside_menu, "outside")
+    private val menuItems = listOf(kitchenMenu, hobbyHouseMenu, xmasMenu, kettleMenu, showerMenu, outsideMenu)
     private val startItem = kitchenMenu
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -163,6 +164,9 @@ class MainActivity : ComponentActivity() {
                                 }
                                 composable(timerMenu.route) {
                                     TimerScreen()
+                                }
+                                composable(outsideMenu.route) {
+                                    OutsideScreen()
                                 }
                             }
                         }

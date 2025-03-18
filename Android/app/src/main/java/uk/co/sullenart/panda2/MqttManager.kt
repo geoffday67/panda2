@@ -5,12 +5,9 @@ import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.exceptions.MqttClientStateException
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish
-import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.future.await
 import java.nio.charset.Charset

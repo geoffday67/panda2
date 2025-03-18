@@ -1,10 +1,6 @@
 package uk.co.sullenart.panda2
 
 import android.app.Application
-import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -16,6 +12,7 @@ import timber.log.Timber
 import uk.co.sullenart.panda2.hobbyhouse.HobbyHouseViewModel
 import uk.co.sullenart.panda2.kettle.KettleViewModel
 import uk.co.sullenart.panda2.kitchen.KitchenViewModel
+import uk.co.sullenart.panda2.outside.OutsideViewModel
 import uk.co.sullenart.panda2.photos.AlbumPager
 import uk.co.sullenart.panda2.photos.PhotosViewModel
 import uk.co.sullenart.panda2.service.Auth
@@ -53,6 +50,7 @@ class MainApplication : Application() {
                     viewModelOf(::ShowerViewModel)
                     viewModelOf(::PhotosViewModel)
                     viewModelOf(::TimerViewModel)
+                    viewModelOf(::OutsideViewModel)
 
                     factoryOf(::AlbumPager)
                     singleOf(::GooglePhotos)

@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,18 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.glance.appwidget.proto.LayoutProto.HorizontalAlignment
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import uk.co.sullenart.panda2.ObserveLifecycleEvents
 import uk.co.sullenart.panda2.R
@@ -57,13 +49,26 @@ fun OutsideScreen(
         Modifier.fillMaxSize()
     ) {
         var temperature by remember { mutableStateOf("") }
-        val indicatorAlpha = remember { Animatable(0f) }
+        val temperatureAlpha = remember { Animatable(0f) }
+
+        var humidity by remember { mutableStateOf("") }
+        val humidityAlpha = remember { Animatable(0f) }
 
         LaunchedEffect(Unit) {
-            viewModel.temperature.collect {
-                temperature = it
-                indicatorAlpha.animateTo(1f)
-                indicatorAlpha.animateTo(0f)
+            launch {
+                viewModel.temperature.collect {
+                    temperature = it
+                    temperatureAlpha.animateTo(1f)
+                    temperatureAlpha.animateTo(0f)
+                }
+            }
+
+            launch {
+                viewModel.humidity.collect {
+                    humidity = it
+                    humidityAlpha.animateTo(1f)
+                    humidityAlpha.animateTo(0f)
+                }
             }
         }
 
@@ -76,9 +81,25 @@ fun OutsideScreen(
         ) {
             ShowTitle("Outside")
 
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.thermometer),
+                    contentDescription = null,
+                )
+            }
+
             Temperature(
                 temperature = temperature,
-                indicatorAlpha = indicatorAlpha.value
+                indicatorAlpha = temperatureAlpha.value
+            )
+
+            Humidity(
+                humidity = humidity,
+                indicatorAlpha = humidityAlpha.value
             )
         }
 
@@ -93,40 +114,77 @@ private fun Temperature(
     temperature: String,
     indicatorAlpha: Float,
 ) {
-    Column(
-        Modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_margin)),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
     ) {
-        Image(
-            painter = painterResource(R.drawable.thermometer),
-            contentDescription = null,
-        )
-
         Box(
-            Modifier
-                .fillMaxWidth(),
+            modifier = Modifier
+                .weight(1f)
+        ) {}
+        Box(
             contentAlignment = Alignment.Center,
-
-            ) {
+        ) {
             Text(
                 text = temperature,
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(start = dimensionResource(R.dimen.margin))
+                .weight(1f),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha), shape = CircleShape)
+                    .height(20.dp)
+                    .aspectRatio(1f)
+            ) {}
+        }
+    }
+}
 
-            Row(
-                Modifier.fillMaxWidth(0.5f),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha), shape = CircleShape)
-                        .height(20.dp)
-                        .aspectRatio(1f)
-                ) {}
-            }
+@Composable
+private fun Humidity(
+    humidity: String,
+    indicatorAlpha: Float,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+        ) {}
+        Box(
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = humidity,
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(start = dimensionResource(R.dimen.margin))
+                .weight(1f),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha), shape = CircleShape)
+                    .height(20.dp)
+                    .aspectRatio(1f)
+            ) {}
         }
     }
 }
@@ -139,8 +197,24 @@ fun ContentPreview() {
     ) {
         ShowTitle("Outside")
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.thermometer),
+                contentDescription = null,
+            )
+        }
+
         Temperature(
-            temperature = "12.3",
+            temperature = "12.3°C",
+            indicatorAlpha = 1f,
+        )
+
+        Humidity(
+            humidity = "Humidity 45.6%",
             indicatorAlpha = 1f,
         )
     }

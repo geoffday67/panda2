@@ -23,14 +23,25 @@ class OutsideViewModel(
     val temperature: Flow<String>
         get() = _temperature.asSharedFlow()
 
+    private val _humidity = MutableSharedFlow<String>()
+    val humidity: Flow<String>
+        get() = _humidity.asSharedFlow()
+
     override fun onResume(owner: LifecycleOwner) {
         viewModelScope.launch {
             _temperature.emit("waiting...")
+            _humidity.emit("waiting...")
             mqttManager.connect()
 
             launch {
                 mqttManager.subscribe(TEMPERATURE_TOPIC).collect {
-                    _temperature.emit(it)
+                    _temperature.emit("$it°C")
+                }
+            }
+
+            launch {
+                mqttManager.subscribe(HUMIDITY_TOPIC).collect {
+                    _humidity.emit("Humidity $it%")
                 }
             }
         }
@@ -43,6 +54,7 @@ class OutsideViewModel(
     }
 
     companion object {
-        const val TEMPERATURE_TOPIC = "sensors/outside/temp-1"
+        const val TEMPERATURE_TOPIC = "sensors/temp-1"
+        const val HUMIDITY_TOPIC = "sensors/humidity-1"
     }
 }

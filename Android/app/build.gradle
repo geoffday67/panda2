@@ -1,60 +1,54 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.google.gms.google-services'
 }
 
 android {
-    namespace 'uk.co.sullenart.panda2'
-    compileSdk 33
+    namespace = 'uk.co.sullenart.panda2'
+    compileSdk = 33
 
     defaultConfig {
-        applicationId "uk.co.sullenart.panda2"
-        minSdk 24
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        applicationId = "uk.co.sullenart.panda2"
+        minSdk = 24
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
     }
 
     signingConfigs {
         debug {
-            storeFile(file("panda.keystore"))
-            storePassword("panda2")
-            keyAlias("panda")
-            keyPassword("panda2")
+            storeFile = file("panda.keystore")
+            storePassword = "panda2"
+            keyAlias = "panda"
+            keyPassword = "panda2"
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+    // Kotlin jvmTarget now defaults to compileOptions.targetCompatibility (built-in Kotlin)
     buildFeatures {
-        compose true
+        compose = true
+        buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.5.1'
-    }
-    packagingOptions {
-        exclude 'META-INF/INDEX.LIST'
-        exclude 'META-INF/io.netty.versions.properties'
+    packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}', 'META-INF/INDEX.LIST', 'META-INF/io.netty.versions.properties']
         }
     }
 }

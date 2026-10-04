@@ -27,6 +27,10 @@ class OutsideViewModel(
     val humidity: Flow<String>
         get() = _humidity.asSharedFlow()
 
+    private val _battery = MutableSharedFlow<Float>()
+    val battery: Flow<Float>
+        get() = _battery.asSharedFlow()
+
     override fun onResume(owner: LifecycleOwner) {
         viewModelScope.launch {
             _temperature.emit("waiting...")
@@ -44,6 +48,15 @@ class OutsideViewModel(
                     _humidity.emit("Humidity $it%")
                 }
             }
+
+            launch {
+                mqttManager.subscribe(BATTERY_TOPIC).collect {
+                    try {
+                        _battery.emit(it.toFloat())
+                    } catch (_: Exception) {
+                    }
+                }
+            }
         }
     }
 
@@ -56,5 +69,6 @@ class OutsideViewModel(
     companion object {
         const val TEMPERATURE_TOPIC = "sensors/temp-1"
         const val HUMIDITY_TOPIC = "sensors/humidity-1"
+        const val BATTERY_TOPIC = "sensors/battery-1"
     }
 }

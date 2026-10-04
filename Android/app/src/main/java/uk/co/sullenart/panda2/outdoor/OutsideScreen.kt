@@ -54,6 +54,9 @@ fun OutsideScreen(
         var humidity by remember { mutableStateOf("") }
         val humidityAlpha = remember { Animatable(0f) }
 
+        var battery by remember { mutableStateOf(0f) }
+        val batteryAlpha = remember { Animatable(0f) }
+
         LaunchedEffect(Unit) {
             launch {
                 viewModel.temperature.collect {
@@ -68,6 +71,14 @@ fun OutsideScreen(
                     humidity = it
                     humidityAlpha.animateTo(1f)
                     humidityAlpha.animateTo(0f)
+                }
+            }
+
+            launch {
+                viewModel.battery.collect {
+                    battery = it
+                    batteryAlpha.animateTo(1f)
+                    batteryAlpha.animateTo(0f)
                 }
             }
         }
@@ -100,6 +111,11 @@ fun OutsideScreen(
             Humidity(
                 humidity = humidity,
                 indicatorAlpha = humidityAlpha.value
+            )
+
+            Battery(
+                battery = battery,
+                indicatorAlpha = batteryAlpha.value
             )
         }
 
@@ -189,6 +205,46 @@ private fun Humidity(
     }
 }
 
+@Composable
+private fun Battery(
+    battery: Float,
+    indicatorAlpha: Float,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+        ) {}
+        Box(
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "Battery ${battery}V",
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (battery < 3.4f) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(start = dimensionResource(R.dimen.margin))
+                .weight(1f),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = indicatorAlpha), shape = CircleShape)
+                    .height(15.dp)
+                    .aspectRatio(1f)
+            ) {}
+        }
+    }
+}
+
 @Preview
 @Composable
 fun ContentPreview() {
@@ -215,6 +271,11 @@ fun ContentPreview() {
 
         Humidity(
             humidity = "Humidity 45.6%",
+            indicatorAlpha = 1f,
+        )
+
+        Battery(
+            battery = 3.0f,
             indicatorAlpha = 1f,
         )
     }
